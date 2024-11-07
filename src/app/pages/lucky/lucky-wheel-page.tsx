@@ -9,8 +9,7 @@ import {queryRaffleAwardList, randomRaffle} from '@/apis'
 import {RaffleAwardVO} from "@/types/RaffleAwardVO";
 
 export function LuckyWheelPage() {
-    const queryParams = new URLSearchParams(window.location.search);
-    const strategyId = Number(queryParams.get('strategyId'));
+
     const [prizes, setPrizes] = useState([{}])
     const myLucky = useRef()
 
@@ -30,7 +29,9 @@ export function LuckyWheelPage() {
 
     // 查询奖品列表
     const queryRaffleAwardListHandle = async () => {
-        const result = await queryRaffleAwardList(strategyId);
+        const queryParams = new URLSearchParams(window.location.search);
+        const strategyIdFromQuery = Number(queryParams.get('strategyId'))
+        const result = await queryRaffleAwardList(strategyIdFromQuery);
         const {code, info, data} = await result.json();
         if (code != "0000") {
             window.alert("获取抽奖奖品列表失败 code:" + code + " info:" + info)
@@ -52,21 +53,20 @@ export function LuckyWheelPage() {
 
     // 调用随机抽奖
     const randomRaffleHandle = async () => {
-        const result = await randomRaffle(strategyId);
+        const queryParams = new URLSearchParams(window.location.search);
+        const strategyIdFromQuery = Number(queryParams.get('strategyId'))
+        const result = await randomRaffle(strategyIdFromQuery);
         const {code, info, data} = await result.json();
         if (code != "0000") {
             window.alert("获取抽奖奖品列表失败 code:" + code + " info:" + info)
             return;
         }
         // 为了方便测试，mock 的接口直接返回 awardIndex 也就是奖品列表中第几个奖品。
-        return data.awardIndex ? data.awardIndex : prizes.findIndex(prize =>
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            //@ts-expect-error
-            prize.fonts.some(font => font.id === data.awardId)
-        ) + 1;
+        return data.awardIndex - 1;
     }
 
     useEffect(() => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         queryRaffleAwardListHandle().then(r => {
         });
     }, [])
@@ -80,12 +80,14 @@ export function LuckyWheelPage() {
             prizes={prizes}
             buttons={buttons}
             onStart={() => {
-                // @ts-ignore
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-expect-error
                 myLucky.current.play()
                 setTimeout(() => {
                     // 抽奖接口
                     randomRaffleHandle().then(prizeIndex => {
-                            // @ts-ignore
+                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                            // @ts-expect-error
                             myLucky.current.stop(prizeIndex);
                         }
                     );
@@ -93,7 +95,8 @@ export function LuckyWheelPage() {
                 }, 2500)
             }}
             onEnd={
-                // @ts-ignore
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-expect-error
                 prize => {
                     alert('恭喜你抽到【' + prize.fonts[0].text + '】奖品ID【' + prize.fonts[0].id + '】')
                 }
