@@ -1,5 +1,18 @@
 //请求地址
-const apiHostUrl= process.env.API_HOST_URL ? process.env.API_HOST_URL : 'https://apifoxmock.com/m1/5385717-5058516-default';
+const apiHostUrl= process.env.API_HOST_URL ? process.env.API_HOST_URL : 'http://localhost:8091';
+
+/**
+ * 装配抽奖
+ */
+export const strategyArmory = (strategyId?: number) =>{
+    return fetch(`${apiHostUrl}/api/v1/raffle/strategy_armory?strategyId=${strategyId}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+
+}
 
 /**
  * 查询抽奖奖品列表
@@ -7,11 +20,12 @@ const apiHostUrl= process.env.API_HOST_URL ? process.env.API_HOST_URL : 'https:/
  */
 export const queryRaffleAwardList = (strategyId: number) => {
     try {
-        return fetch(`${apiHostUrl}/api/v1/raffle/query_raffle_award_list?strategyId=${strategyId}`, {
-            method: 'get',
+        return fetch(`${apiHostUrl}/api/v1/raffle/query_raffle_award_list`, {
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json;charset=utf-8'
-            }
+            },
+            body: JSON.stringify({strategyId: strategyId})
         });
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
@@ -39,11 +53,12 @@ export const queryRaffleAwardList = (strategyId: number) => {
  */
 export const randomRaffle = (strategyId: number) => {
     try {
-        return fetch(`${apiHostUrl}/api/v1/raffle/random_raffle?strategyId=${strategyId}`, {
-            method: 'get',
+        return fetch(`${apiHostUrl}/api/v1/raffle/random_raffle`, {
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json;charset=utf-8'
-            }
+            },
+            body: JSON.stringify({strategyId: strategyId})
         })
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
