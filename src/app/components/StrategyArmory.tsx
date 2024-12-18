@@ -1,19 +1,20 @@
-import {strategyArmory} from "@/apis";
+import {activityStrategyArmory} from "@/apis";
 
 export function StrategyArmory() {
     const strategyArmoryHandle = async () => {
         const queryParams = new URLSearchParams(window.location.search);
-        const strategyId = Number(queryParams.get('strategyId'));
-        if (!strategyId){
-            window.alert("请在请求地址中，配置 strategyId 值，如：http://localhost:3000/?strategyId=100006")
+        const activityId = Number(queryParams.get('activityId'));
+        if (!activityId){
+            window.alert("请在请求地址中，配置 activityId 值，如：http://localhost:3000/?activityId=100006")
             return;
         }
-        const res = await strategyArmory(strategyId);
+        const res = await activityStrategyArmory(activityId);
         const {code, info} = await res.json();
         if (code != "0000") {
             window.alert("抽奖策略装配失败 code:" + code + " info:" + info)
             return;
         }
+        window.alert("装配完成，开始体验吧!")
     }
 
     return (
@@ -22,7 +23,7 @@ export function StrategyArmory() {
             style={{cursor: "pointer"}}
             onClick={strategyArmoryHandle}
         >
-            装配抽奖
+            装配抽奖「测试前点击预热数据」
         </div>
     );
 }

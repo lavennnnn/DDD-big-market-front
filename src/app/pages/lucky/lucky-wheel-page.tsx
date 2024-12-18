@@ -5,16 +5,16 @@ import React, {useEffect, useRef, useState} from 'react'
 // @ts-expect-error
 import {LuckyWheel} from '@lucky-canvas/react'
 
-import {queryRaffleAwardList, randomRaffle} from '@/apis'
+import {queryRaffleAwardList, draw} from '@/apis'
 import {RaffleAwardVO} from "@/types/RaffleAwardVO";
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 export function LuckyWheelPage() {
-
     const [prizes, setPrizes] = useState([{}])
     const myLucky = useRef()
 
     const [blocks] = useState([
-        {padding: '10px', background: '#869cfa'}
+        {padding: '10px', background: '#869cfa', imgs: [{src: "https://bugstack.cn/images/system/blog-03.png"}]}
     ])
 
     const [buttons] = useState([
@@ -30,8 +30,9 @@ export function LuckyWheelPage() {
     // 查询奖品列表
     const queryRaffleAwardListHandle = async () => {
         const queryParams = new URLSearchParams(window.location.search);
-        const strategyIdFromQuery = Number(queryParams.get('strategyId'))
-        const result = await queryRaffleAwardList(strategyIdFromQuery);
+        const userId = String(queryParams.get('userId'));
+        const activityId = Number(queryParams.get('activityId'));
+        const result = await queryRaffleAwardList(userId, activityId);
         const {code, info, data} = await result.json();
         if (code != "0000") {
             window.alert("获取抽奖奖品列表失败 code:" + code + " info:" + info)
@@ -54,11 +55,12 @@ export function LuckyWheelPage() {
     // 调用随机抽奖
     const randomRaffleHandle = async () => {
         const queryParams = new URLSearchParams(window.location.search);
-        const strategyIdFromQuery = Number(queryParams.get('strategyId'))
-        const result = await randomRaffle(strategyIdFromQuery);
+        const userId = String(queryParams.get('userId'));
+        const activityId = Number(queryParams.get('activityId'));
+        const result = await draw(userId, activityId);
         const {code, info, data} = await result.json();
         if (code != "0000") {
-            window.alert("获取抽奖奖品列表失败 code:" + code + " info:" + info)
+            window.alert("随机抽奖失败 code:" + code + " info:" + info)
             return;
         }
         // 为了方便测试，mock 的接口直接返回 awardIndex 也就是奖品列表中第几个奖品。
@@ -87,7 +89,7 @@ export function LuckyWheelPage() {
                     // 抽奖接口
                     randomRaffleHandle().then(prizeIndex => {
                         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                            // @ts-expect-error
+                        // @ts-expect-error
                             myLucky.current.stop(prizeIndex);
                         }
                     );
